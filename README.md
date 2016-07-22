@@ -1,5 +1,5 @@
 # PokemonGo Radar React Native Android App
-![Alt text](ratatafinder.jpeg?raw=true "Screenshot")
+![Alt text](ratatafinder.gif?raw=true "Screenshot")
 
 ### Installation
 Set up the working environment using [Getting Started](https://facebook.github.io/react-native/docs/getting-started.html)
