@@ -1,4 +1,7 @@
 config.json
+android/app/*.jks
+android/app/*.apk
+android/app/*.gradle
 # OSX
 #
 .DS_Store

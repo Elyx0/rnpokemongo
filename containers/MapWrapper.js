@@ -17,27 +17,42 @@ class MapWrapper extends Component {
     super(props);
     this.state = {
       mapRef:null,
+      loadingMessage:'Finding your location...',
     };
   }
-  componentDidMount() {
-    //return; //Remove me
+
+  updateOrInitPosition(position) {
+    console.log(position)
+    if (this.props.mapInfo.toJS().position) {
+      this.props.dispatch(mapActions.updatePosition(position));
+    } else {
+      this.props.dispatch(mapActions.init(position));
+    }
+  }
+
+  pinpointLocation(highAccuracyFlag) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        //var initialPosition = JSON.stringify(position);
-        console.log(position);
-        this.props.dispatch(mapActions.init(position));
-
+        this.updateOrInitPosition(position);
       },
-      (error) => {console.log(error)},
-      {enableHighAccuracy: true, timeout: 20000, maximumAge: 2000}
+      (error) => {console.log(error); this.pinpointLocation(false); },
+      {enableHighAccuracy: highAccuracyFlag, timeout: 20000, maximumAge: 2000}
     );
     this.watchID = navigator.geolocation.watchPosition((position) => {
       console.log(position);
-      this.props.dispatch(mapActions.updatePosition(position));
+      if (this.props.mapInfo.toJS().position) {
+        this.props.dispatch(mapActions.updatePosition(position));
+      } else {
+        this.props.dispatch(mapActions.init(position));
+      }
+
       //this.setState({lastPosition});
-    },(error) => {console.log(error)},
-    {enableHighAccuracy: true, timeout: 20000, maximumAge: 2000});
-    console.log(this.refs);
+    },(error) => {console.log(error); this.pinpointLocation(false);},
+    {enableHighAccuracy: highAccuracyFlag, timeout: 20000, maximumAge: 2000});
+  }
+
+  componentDidMount() {
+    this.pinpointLocation(true);
   }
 
   componentWillUnmount() {
@@ -128,45 +143,49 @@ class MapWrapper extends Component {
       </MapView>)
 
     } else {
-      return (<View style={{alignSelf:'stretch',flex:1,alignItems:'center',justifyContent:'center'}}><Text>Finding your location...</Text></View>)
-    }
+      let message = "Finding your location...";
+      if (mapInfo.position) message = "Logging into PokemonGo...";
+      return (<View style={{alignSelf:'stretch',flex:1,alignItems:'center',justifyContent:'center'}}>
+      <Text>{message}</Text>
+    </View>)
   }
+}
 
-  renderToolBar(mapInfo) {
-    if (!mapInfo.position || !mapInfo.region) return null;
-    return (<View style={{position:'absolute',left:0,right:0,bottom:40,alignSelf:'stretch',alignItems:'center',justifyContent:'center'}}>
-    <TouchableOpacity style={{
-        padding:10,
-        paddingLeft:20,
-        paddingRight:20,
-        backgroundColor:'rgba(0,0,0,.5)',
-        borderRadius:15,
-      }} onPress={() => {
-        console.log('PRESSED!',this.refs);
-        this.refs.myMap.animateToRegion({
-          latitude: mapInfo.position.coords.latitude,
-          longitude: mapInfo.position.coords.longitude,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,
-        });
-      }}><Text style={{
+renderToolBar(mapInfo) {
+  if (!mapInfo.position || !mapInfo.region) return null;
+  return (<View style={{position:'absolute',left:0,right:0,bottom:40,alignSelf:'stretch',alignItems:'center',justifyContent:'center'}}>
+  <TouchableOpacity style={{
+      padding:10,
+      paddingLeft:20,
+      paddingRight:20,
+      backgroundColor:'rgba(0,0,0,.5)',
+      borderRadius:15,
+    }} onPress={() => {
+      console.log('PRESSED!',this.refs);
+      this.refs.myMap.animateToRegion({
+        latitude: mapInfo.position.coords.latitude,
+        longitude: mapInfo.position.coords.longitude,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      });
+    }}><Text style={{
 
-        fontSize:20,
-        color:'white',
-      }}>·</Text></TouchableOpacity>
-    </View>);
-  }
+      fontSize:20,
+      color:'white',
+    }}>·</Text></TouchableOpacity>
+  </View>);
+}
 
-  render() {
-    const mapInfo = this.props.mapInfo.toJS();
-    console.log(mapInfo);
-    return (
-      <View style={styles.container}>
-        {this.renderMapOrLoading(mapInfo)}
-        {this.renderToolBar(mapInfo)}
-      </View>
-    );
-  }
+render() {
+  const mapInfo = this.props.mapInfo.toJS();
+  console.log(mapInfo);
+  return (
+    <View style={styles.container}>
+      {this.renderMapOrLoading(mapInfo)}
+      {this.renderToolBar(mapInfo)}
+    </View>
+  );
+}
 }
 
 export default connect(mapStateToProps)(MapWrapper);
