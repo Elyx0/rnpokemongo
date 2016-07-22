@@ -1,0 +1,25 @@
+{
+  "name": "rnpokemongo",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start"
+  },
+  "dependencies": {
+    "axios": "^0.13.1",
+    "immutable": "^3.8.1",
+    "moment": "^2.14.1",
+    "qs": "^6.2.0",
+    "react": "15.2.1",
+    "react-addons-pure-render-mixin": "^15.2.1",
+    "react-native": "^0.29.2",
+    "react-native-device-info": "^0.9.3",
+    "react-native-maps": "^0.7.1",
+    "react-native-router-flux": "^3.31.1",
+    "react-native-spinkit": "^0.1.2",
+    "react-redux": "^4.4.5",
+    "redux": "^3.5.2",
+    "redux-logger": "^2.6.1",
+    "redux-thunk": "^2.1.0"
+  }
+}
